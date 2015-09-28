@@ -8,17 +8,6 @@
 
 import UIKit
 
-enum rowId: String {
-    case Deal = "Offering a Deal"
-    case BestMatch = "Best Match"
-    case Radius800 = "800 meters"
-    case Radius1600 = "1600 meters"
-    case Radius8000 = "8000 meters"
-    case Radius16000 = "16000 meters"
-    case SortByDistance = "Distance"
-    case SortByRating = "Highest Rated"
-}
-
 @objc protocol FiltersViewControllerDelegate {
     optional func filtersViewController(filtersViewController: FiltersViewController, didUpdateFilters filters: [String:AnyObject])
 }
@@ -26,7 +15,23 @@ enum rowId: String {
 class FiltersViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, SwitchTableViewCellDelegate {
 
 //    The filters you should actually have are: category, sort (best match, distance, highest rated), radius (meters), deals (on/off).
-    var sections = ["Deals", "Distance", "Distance", "Sort by", "Category"]
+    let sections = ["Deals", "Distance", "Sort by", "Category"]
+
+    let distance = [
+        ["Best match", 0],
+        ["500 meters", 500],
+        ["1 km", 1000],
+        ["1.5 km", 1500],
+        ["3 km", 3000]
+    ]
+    var distanceSelected = 0
+    
+    let sortBy = [
+        ["Best Match", 0],
+        ["Distance", 1],
+        ["Highest Rated", 2]
+    ]
+    var sortBySelected = 0
     
     var categories: [[String:String]]!
     var categoriesSwitchStates = [Int:Bool]()
@@ -59,6 +64,12 @@ class FiltersViewController: UIViewController, UITableViewDataSource, UITableVie
         // Deals
         filters["deals"] = dealsSwitchState
         
+        // Distance
+        filters["distance"] = distance[distanceSelected][1]
+        
+        // Sort by
+        filters["sortBy"] = sortBy[sortBySelected][1]
+        
         // Categories
         var selectedCategories = [String]()
         for (row, isSelected) in categoriesSwitchStates {
@@ -78,11 +89,14 @@ class FiltersViewController: UIViewController, UITableViewDataSource, UITableVie
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if section == 0 {
             return 1
-        } else if section == 4 {
+        } else if section == 1 {
+            return distance.count
+        } else if section == 2 {
+            return sortBy.count
+        } else if section == 3 {
             return categories.count
-        } else {
-            return 1
         }
+        return 1
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
@@ -93,7 +107,27 @@ class FiltersViewController: UIViewController, UITableViewDataSource, UITableVie
             cell.delegate = self
             cell.onSwitch.on = dealsSwitchState
             return cell
-        } else if indexPath.section == 4 {
+        } else if indexPath.section == 1 {
+            let cell = UITableViewCell()
+            if indexPath.row == distanceSelected {
+                cell.accessoryType = .Checkmark
+            } else {
+                cell.accessoryType = .None
+            }
+            
+            cell.textLabel?.text = distance[indexPath.row][0] as? String
+            return cell
+        } else if indexPath.section == 2 {
+            let cell = UITableViewCell()
+            if indexPath.row == sortBySelected {
+                cell.accessoryType = .Checkmark
+            } else {
+                cell.accessoryType = .None
+            }
+            
+            cell.textLabel?.text = sortBy[indexPath.row][0] as? String
+            return cell
+        } else if indexPath.section == 3 {
             // Category
             let cell = tableView.dequeueReusableCellWithIdentifier("SwitchCell", forIndexPath: indexPath) as! SwitchTableViewCell
             cell.switchLabel.text = categories[indexPath.row]["name"]
@@ -105,20 +139,16 @@ class FiltersViewController: UIViewController, UITableViewDataSource, UITableVie
             let cell = tableView.dequeueReusableCellWithIdentifier("SwitchCell", forIndexPath: indexPath) as! SwitchTableViewCell
             return cell
         }
+    }
+    
+    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        if indexPath.section == 1 {
+            distanceSelected = indexPath.row
+        } else if indexPath.section == 2 {
+            sortBySelected = indexPath.row
+        }
         
-//        cell = tableView.dequeueReusableCellWithIdentifier("SwitchCell", forIndexPath: indexPath) as! SwitchTableViewCell
-//        cell.switchLabel.text = categories[indexPath.row]["name"]
-        
-
-        
-        
-//        if switchStates[indexPath.row] != nil {
-//            cell.onSwitch.on = switchStates[indexPath.row]!
-//        } else {
-//            cell.onSwitch.on = false
-//        }
-        // Same as previous block
-        
+        tableView.reloadData()
     }
     
     func switchCell(switchTableViewCell: SwitchTableViewCell, didChangeValue value: Bool) {
@@ -126,7 +156,7 @@ class FiltersViewController: UIViewController, UITableViewDataSource, UITableVie
         
         if indexPath?.section == 0 {
             dealsSwitchState = value
-        } else if indexPath?.section == 4 {
+        } else if indexPath?.section == 3 {
             categoriesSwitchStates[indexPath!.row] = value
         } else {
 
