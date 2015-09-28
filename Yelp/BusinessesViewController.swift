@@ -23,7 +23,7 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
         // Search bar
         let searchBar = UISearchBar()
         searchBar.sizeToFit()
-        searchBar.placeholder = "Search"
+        searchBar.placeholder = "What are you looking for?"
         navigationItem.titleView = searchBar
         searchBar.delegate = self
         
