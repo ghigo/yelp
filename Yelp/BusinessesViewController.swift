@@ -8,7 +8,7 @@
 
 import UIKit
 
-class BusinessesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, FiltersViewControllerDelegate {
+class BusinessesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, FiltersViewControllerDelegate, UISearchBarDelegate {
 
     @IBOutlet weak var tableView: UITableView!
     
@@ -20,34 +20,36 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
         tableView.delegate = self
         tableView.dataSource = self
         
+        // Search bar
+        let searchBar = UISearchBar()
+        searchBar.sizeToFit()
+        searchBar.placeholder = "Search"
+        navigationItem.titleView = searchBar
+        searchBar.delegate = self
+        
+        
         // The next 2 lines should go together
         tableView.rowHeight = UITableViewAutomaticDimension
         tableView.estimatedRowHeight = 120
-
-//        Business.searchWithTerm("Thai", completion: { (businesses: [Business]!, error: NSError!) -> Void in
-//            self.businesses = businesses
-//            
-//            for business in businesses {
-//                println(business.name!)
-//                println(business.address!)
-//            }
-//        })
         
-        Business.searchWithTerm("Restaurants", sort: .Distance, categories: ["asianfusion", "burgers"], deals: true) { (businesses: [Business]!, error: NSError!) -> Void in
-            self.businesses = businesses
-            self.tableView.reloadData()
-            
-            for business in businesses {
-                print(business.name!)
-                print(business.address!)
-                print(business.categories!)
-            }
-        }
+        Business.searchWithTerm("Restaurants", sort: .Distance, categories: [], deals: true, completion: self.onData)
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
+    }
+    
+    // Data received
+    func onData(businesses: [Business]!, error: NSError!) -> Void {
+        self.businesses = businesses
+        self.tableView.reloadData()
+        
+        for business in businesses {
+            print(business.name!)
+            print(business.address!)
+            print(business.categories!)
+        }
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -57,6 +59,10 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
             return 0
         }
         
+    }
+    
+    func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
+        Business.searchWithTerm(searchText, sort: .Distance, categories: [], deals: nil, completion: self.onData)
     }
 
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
@@ -75,12 +81,11 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
     }
     
     func filtersViewController(filtersViewController: FiltersViewController, didUpdateFilters filters: [String : AnyObject]) {
-        var categories = filters["categories"] as? [String]
+        let categories = (filters["categories"] as? [String])!
         
-        Business.searchWithTerm("Restaurant", sort: nil, categories: categories, deals: nil) { ( businesses: [Business]!, erros: NSError!) -> Void in
-            self.businesses = businesses
-            self.tableView.reloadData()
-        }
+        Business.searchWithTerm("Restaurant", sort: nil, categories: categories, deals: nil, completion: self.onData)
     }
-
 }
+
+
+

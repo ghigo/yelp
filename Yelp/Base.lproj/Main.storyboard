@@ -6,7 +6,7 @@
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <scenes>
-        <!--Yelp-->
+        <!--Businesses View Controller-->
         <scene sceneID="5L9-Uz-lNK">
             <objects>
                 <viewController id="2xI-yr-O5N" customClass="BusinessesViewController" customModule="Yelp" customModuleProvider="target" sceneMemberID="viewController">
@@ -125,7 +125,7 @@
                             <constraint firstItem="VBY-gq-v8E" firstAttribute="top" secondItem="clp-Ui-g9N" secondAttribute="bottom" id="pWp-7B-nNP"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" title="Yelp" id="Ewe-gk-OFZ">
+                    <navigationItem key="navigationItem" id="Ewe-gk-OFZ">
                         <barButtonItem key="leftBarButtonItem" title="Filters" id="sSm-uz-KAP">
                             <connections>
                                 <segue destination="Y9j-4V-uF5" kind="modal" id="pyx-Qi-xy3"/>
