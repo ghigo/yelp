@@ -31,6 +31,6 @@ Time spent: 12h
 
 ### Walkthrough
 
-![Video Walkthrough](...)
+![Video Walkthrough](https://github.com/ghigo/yelp/blob/master/yelp.gif)
 
 
